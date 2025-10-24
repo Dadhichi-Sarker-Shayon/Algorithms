@@ -54,7 +54,7 @@ vector<pair<vector<int>, int>> Yens_algorithm(vector<vector<pair<int, int>>> gra
     vector<int> path = firstResult.first;
     int cost = firstResult.second;
     A.push_back({path, cost});
-    set<pair<vector<int>, int>> B;
+    set<pair<int,vector<int>>> B;
     for (int k = 1; k < K; k++)
     {
         vector<int> prevPath = A[k - 1].first;
@@ -113,7 +113,7 @@ vector<pair<vector<int>, int>> Yens_algorithm(vector<vector<pair<int, int>>> gra
                         }
                     }
                 }
-                B.insert({totalPath,totalCost});
+                B.insert({totalCost,totalPath});
             }
 
         }
@@ -121,9 +121,9 @@ vector<pair<vector<int>, int>> Yens_algorithm(vector<vector<pair<int, int>>> gra
         {
             break;
         }
-        pair<vector<int>,int> best = *B.begin();
-        vector<int> bestPath = best.first;
-        int bestCost = best.second;
+        pair<int,vector<int>> best = *B.begin();
+        vector<int> bestPath = best.second;
+        int bestCost = best.first;
         B.erase(B.begin());     
         A.push_back({bestPath, bestCost});
        
