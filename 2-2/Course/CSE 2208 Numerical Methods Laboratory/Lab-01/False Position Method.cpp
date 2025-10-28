@@ -1,18 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
+vector<double> coef;
+int degree;
 double f(double x)
 {
-    return 3 * x - cos(x) - 1;
-    //return x*x-4*x-10;
+    double value = 0.0;
+    for (int i = 0; i <= degree; i++)
+    {
+        value += coef[i] * pow(x, degree - i);
+    }
+    return value;
 }
-bool stop(double prev, double curr, double tol)
+vector<pair<double, int>> False_position(double l, double u, double tol, double step,vector<pair<double, double>> &intervals)
 {
-    return fabs(prev - curr) < tol;
-}
-vector<double> False_position(double l, double u, double tol, double step)
-{
-    vector<pair<double, double>> intervals;
-    vector<double> roots;
+    
+    vector<pair<double, int>> roots;
     double x = l;
     while (x <= u)
     {
@@ -30,16 +32,11 @@ vector<double> False_position(double l, double u, double tol, double step)
 
         double fa = f(a);
         double fb = f(b);
-        if (fa * fb > 0)
-        {
-            cout << "invalid interval\n";
-            continue;
-        }
+
         double prev = a;
-        double mid = a-f(a)*((b-a)/(f(b)-f(a)));
-        int max_iter = 1000;
+        double mid = a - f(a) * ((b - a) / (f(b) - f(a)));
         int iter = 0;
-        while (!stop(prev, mid, tol) && iter < max_iter)
+        while (fabs(mid - prev) >= tol )
         {
 
             double fmid = f(mid);
@@ -58,39 +55,33 @@ vector<double> False_position(double l, double u, double tol, double step)
                 fa = fmid;
             }
             prev = mid;
-            mid = a-f(a)*((b-a)/(f(b)-f(a)));
+            mid = a - f(a) * ((b - a) / (f(b) - f(a)));
             iter++;
         }
-        roots.push_back(mid);
+        roots.push_back({mid, iter});
     }
-    sort(roots.begin(), roots.end());
-    roots.erase(unique(roots.begin(), roots.end(), [tol](double a, double b)
-                       { return fabs(a - b) < tol; }),
-                roots.end());
-
     return roots;
 }
 int main()
 {
-    double l, u, tol;
-    cout << "Enter lower bound: ";
-    cin >> l;
-    cout << l << endl;
-    cout << "Enter upper bound: ";
-    cin >> u;
-    cout << u << endl;
-    cout << "Enter tolerance: ";
-    cin >> tol;
-    cout << tol << endl;
-    cout << "Enter step size: ";
-    double step;
-    cin >> step;
-    cout<< step << endl;
-    vector<double> roots = False_position(l, u, tol, step);
-    cout << "Roots found:\n";
-    for (double root : roots)
+    degree = 4;
+    coef.resize(degree + 1);
+    for (int i = 0; i <= degree; i++)
     {
-        cout << root << "\n";
+        cin >> coef[i];
+    }
+
+    vector<pair<double, int>> roots;
+    vector<pair<double, double>> ranges;
+    double tol = 1e-4;
+    double l = -sqrt(((coef[1] / coef[0]) * (coef[1] / coef[0])) - 2 * (coef[2] / coef[0]));
+    double u = -1 * l;
+    cout << l << " " << u << endl;
+    roots = False_position(l, u, tol, 0.5, ranges);
+    cout << "Roots\t\t\tIterations\t\t\tRanges" << endl;
+    for (int i = 0; i < roots.size(); i++)
+    {
+        cout << roots[i].first << "\t\t\t" << roots[i].second<< "\t\t\t"<< ranges[i].first << " - " << ranges[i].second << endl;
     }
     return 0;
 }
